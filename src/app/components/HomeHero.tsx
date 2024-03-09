@@ -36,7 +36,6 @@ export const HomeHero = () => {
       }
       const data = await response.json();
       setUsers(data.items);
-      clg
     } catch (error) {
       console.error('Error fetching data:', error);
     }
