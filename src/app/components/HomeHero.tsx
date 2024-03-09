@@ -1,6 +1,24 @@
-import React from "react";
+import { SetStateAction, useState } from "react";
 
 export const HomeHero = () => {
+  const [location, setLocation] = useState('');
+  const [users, setUsers] = useState([]);
+  const handleChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+    setLocation(event.target.value);
+  };
+  const handleSubmit = async (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`https://api.github.com/search/users?q=location:${location}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setUsers(data.items);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
   return (
     <>
       <div className="relative overflow-hidden">
@@ -11,11 +29,11 @@ export const HomeHero = () => {
             </h1>
 
             <p className="mt-3 text-gray-600 dark:text-gray-400">
-            GeoDevX helps users explore GitHub's top contributors by location.
+              GeoDevX helps users explore GitHub's top contributors by location.
             </p>
 
             <div className="mt-7 sm:mt-12 mx-auto max-w-xl relative">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="relative z-10 flex space-x-3 p-3 bg-white border rounded-lg shadow-lg shadow-gray-100 dark:bg-slate-900 dark:border-gray-700 dark:shadow-gray-900/[.2]">
                   <div className="flex-[1_0_0%]">
                     <label
@@ -25,10 +43,11 @@ export const HomeHero = () => {
                       <span className="sr-only">Search Location</span>
                     </label>
                     <input
-                      type="email"
-                      name="hs-search-article-1"
-                      id="hs-search-article-1"
+                      type="text"
+                      // name="hs-search-article-1"
+                      // id="hs-search-article-1"
                       className="py-2.5 px-4 block w-full border-transparent rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                      value={location} onChange={handleChange}
                       placeholder="Search Location"
                     />
                   </div>
@@ -62,20 +81,20 @@ export const HomeHero = () => {
                   <path
                     d="M5 16.4754C11.7688 27.4499 21.2452 57.3224 5 89.0164"
                     stroke="currentColor"
-                    stroke-width="10"
-                    stroke-linecap="round"
+                    strokeWidth="10"
+                    strokeLinecap="round"
                   />
                   <path
                     d="M33.6761 112.104C44.6984 98.1239 74.2618 57.6776 83.4821 5"
                     stroke="currentColor"
-                    stroke-width="10"
-                    stroke-linecap="round"
+                    strokeWidth="10"
+                    strokeLinecap="round"
                   />
                   <path
                     d="M50.5525 130C68.2064 127.495 110.731 117.541 116 78.0874"
                     stroke="currentColor"
-                    stroke-width="10"
-                    stroke-linecap="round"
+                    strokeWidth="10"
+                    strokeLinecap="round"
                   />
                 </svg>
               </div>
@@ -91,12 +110,17 @@ export const HomeHero = () => {
                   <path
                     d="M4 82.4591C54.7956 92.8751 30.9771 162.782 68.2065 181.385C112.642 203.59 127.943 78.57 122.161 25.5053C120.504 2.2376 93.4028 -8.11128 89.7468 25.5053C85.8633 61.2125 130.186 199.678 180.982 146.248L214.898 107.02C224.322 95.4118 242.9 79.2851 258.6 107.02C274.299 134.754 299.315 125.589 309.861 117.539L343 93.4426"
                     stroke="currentColor"
-                    stroke-width="7"
-                    stroke-linecap="round"
+                    strokeWidth="7"
+                    strokeLinecap="round"
                   />
                 </svg>
               </div>
             </div>
+            <ul>
+              {users.map(user => (
+                <li key={user.id}>{user.login}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
