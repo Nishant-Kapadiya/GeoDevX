@@ -1,24 +1,6 @@
-import { SetStateAction, useState } from "react";
+import React from "react";
 
 export const HomeHero = () => {
-  const [location, setLocation] = useState('');
-  const [users, setUsers] = useState([]);
-  const handleChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-    setLocation(event.target.value);
-  };
-  const handleSubmit = async (event: { preventDefault: () => void; }) => {
-    event.preventDefault();
-    try {
-      const response = await fetch(`https://api.github.com/search/users?q=location:${location}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setUsers(data.items);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
   return (
     <>
       <div className="relative overflow-hidden">
@@ -33,7 +15,7 @@ export const HomeHero = () => {
             </p>
 
             <div className="mt-7 sm:mt-12 mx-auto max-w-xl relative">
-              <form onSubmit={handleSubmit}>
+              <form>
                 <div className="relative z-10 flex space-x-3 p-3 bg-white border rounded-lg shadow-lg shadow-gray-100 dark:bg-slate-900 dark:border-gray-700 dark:shadow-gray-900/[.2]">
                   <div className="flex-[1_0_0%]">
                     <label
@@ -44,10 +26,9 @@ export const HomeHero = () => {
                     </label>
                     <input
                       type="text"
-                      // name="hs-search-article-1"
-                      // id="hs-search-article-1"
+                      name="hs-search-article-1"
+                      id="hs-search-article-1"
                       className="py-2.5 px-4 block w-full border-transparent rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
-                      value={location} onChange={handleChange}
                       placeholder="Search Location"
                     />
                   </div>
@@ -116,11 +97,6 @@ export const HomeHero = () => {
                 </svg>
               </div>
             </div>
-            <ul>
-              {users.map(user => (
-                <li key={user.id}>{user.login}</li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>
