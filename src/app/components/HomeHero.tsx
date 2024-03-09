@@ -1,6 +1,46 @@
-import React from "react";
+import { useState, useEffect, SetStateAction } from "react";
 
 export const HomeHero = () => {
+  const [location, setLocation] = useState('');
+  const [users, setUsers] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState('');
+  useEffect(() => {
+    const fetchCurrentLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setCurrentLocation(`${position.coords.latitude},${position.coords.longitude}`);
+          },
+          (error) => {
+            console.error('Error getting current location:', error);
+          }
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+    };
+
+    fetchCurrentLocation();
+  }, []);
+
+  const handleChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+    setLocation(event.target.value);
+  };
+
+  const handleSubmit = async (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(`https://api.github.com/search/users?q=location:${location || currentLocation}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setUsers(data.items);
+      clg
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
   return (
     <>
       <div className="relative overflow-hidden">
@@ -11,11 +51,11 @@ export const HomeHero = () => {
             </h1>
 
             <p className="mt-3 text-gray-600 dark:text-gray-400">
-            GeoDevX helps users explore GitHub's top contributors by location.
+              GeoDevX helps users explore GitHub's top contributors by location.
             </p>
 
             <div className="mt-7 sm:mt-12 mx-auto max-w-xl relative">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="relative z-10 flex space-x-3 p-3 bg-white border rounded-lg shadow-lg shadow-gray-100 dark:bg-slate-900 dark:border-gray-700 dark:shadow-gray-900/[.2]">
                   <div className="flex-[1_0_0%]">
                     <label
@@ -25,17 +65,17 @@ export const HomeHero = () => {
                       <span className="sr-only">Search Location</span>
                     </label>
                     <input
-                      type="email"
+                      type="text"
                       name="hs-search-article-1"
                       id="hs-search-article-1"
                       className="py-2.5 px-4 block w-full border-transparent rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-transparent dark:text-gray-400 dark:focus:ring-gray-600"
+                      value={location} onChange={handleChange}
                       placeholder="Search Location"
                     />
                   </div>
                   <div className="flex-[0_0_auto]">
-                    <a
+                    <button
                       className="size-[46px] inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-                      href="#"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +86,7 @@ export const HomeHero = () => {
                       >
                         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                       </svg>
-                    </a>
+                    </button>
                   </div>
                 </div>
               </form>
@@ -97,6 +137,11 @@ export const HomeHero = () => {
                 </svg>
               </div>
             </div>
+            <ul>
+              {users.map(user => (
+                <li key={user.id}>{user.login}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
